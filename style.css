@@ -1,0 +1,144 @@
+/* Body Styling */
+body {
+    background-color: #91eb87;  /* Light Blue */
+    color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Title and Headers */
+h1, h2, h3 {
+    color: #f9ca24;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+
+
+h1 {
+    font-size: 2.5rem;
+}
+
+/* Buttons */
+.stButton>button {
+    background-color: #6ab04c;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.stButton>button:hover {
+    background-color: #badc58;
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
+    transform: scale(1.05);
+}
+
+/* Sidebar */
+.css-1aumxhk {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #f9ca24;
+    border-radius: 15px;
+}
+
+/* Input Boxes */
+input[type="text"] {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid #f9ca24;
+    color: #1e272e;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+/* Dataframe Styling */
+.css-1ekf893 {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* Tab Highlight */
+.css-1m05g4e {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #f9ca24;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+button.spotify-btn {
+    background-color: #b31942;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Input Boxes */
+input[type="text"] {
+    background-color: #ffffff;  /* Black background */
+    color: #100e0e;  /* White text */
+    padding: 10px;
+    border: 2px solid #f9ca24;  /* Border color */
+    border-radius: 8px;
+    font: 16px italic #100e0e;
+    width: 100%;  /* Ensures the input field takes full width */
+    
+    
+}
+
+/* Input Focus Styles */
+input[type="text"]:focus {
+    background-color: #333333;  /* Slightly lighter black background when focused */
+    border-color: #f9ca24;  /* Border color when focused */
+    outline: none;  /* Removes the default outline */
+}
+
+/* Centering the input song block */
+div.song-input {
+    text-align: center;
+    background-color: #f9ca24;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for recommended song blocks */
+div.song-recommendation {
+    background-color: #6ab04c;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    margin: 10px;
+}
+
+div.song-recommendation img {
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+div.song-recommendation button {
+    margin-top: 10px;
+    font-size: 14px;
+    background-color: #b31942;
+    color: white;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    
+}
+
+/* Increase the font size and padding of the tabs */
+
