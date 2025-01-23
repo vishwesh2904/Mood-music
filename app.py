@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, accuracy_score
 from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy
 from dotenv import load_dotenv
@@ -22,6 +25,10 @@ load_dotenv()
 # Spotify API credentials
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
+# print(f"CLIENT_ID: {CLIENT_ID}")
+# print(f"CLIENT_SECRET: {CLIENT_SECRET}")
+
 if not CLIENT_ID or not CLIENT_SECRET:
     raise Exception("Spotify CLIENT_ID and CLIENT_SECRET are not set correctly.")
 
@@ -43,7 +50,7 @@ data = data.drop_duplicates(subset=['track_name'])
 
 # Assign mood to songs
 def assign_mood(row):
-    mood_score = row['valence'] * 0.4 + row['energy'] * 0.4 + row['danceability'] * 0.2
+    mood_score = row['valence'] * 0.4 + row['energy'] * 0.4 + row['danceability'] * 0.2 
     if mood_score > 0.9:
         return 'Happiness'
     elif mood_score > 0.75:
@@ -69,17 +76,35 @@ features = ['popularity', 'duration_ms', 'danceability', 'energy', 'key', 'loudn
 scaler = StandardScaler()
 data[features] = scaler.fit_transform(data[features])
 
+# Train-Test Split for Random Forest
+X = data[features]  # Features
+y = data['mood']    # Target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train Random Forest Classifier
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+
+# Evaluate the model
+y_pred = rf_model.predict(X_test)
+st.write("Model Accuracy:", accuracy_score(y_test, y_pred))
+# st.write("Classification Report:")
+# st.text(classification_report(y_test, y_pred))
+
 # Recommendation functions
-def recommend_songs_by_input(song_name, data, num_recommendations=5):
+def recommend_songs_by_input(song_name, data, rf_model, num_recommendations=5):
     song_row = data[data['track_name'].str.contains(song_name, case=False, na=False)]
     if song_row.empty:
         return None, None
 
     song_id = song_row.index[0]
     song_features = data.loc[song_id, features].values.reshape(1, -1)
-    song_mood = data.loc[song_id, 'mood']
 
-    mood_filtered_data = data[data['mood'] == song_mood]
+    # Predict the mood of the input song
+    predicted_mood = rf_model.predict(song_features)[0]
+
+    # Filter songs with the same predicted mood
+    mood_filtered_data = data[data['mood'] == predicted_mood]
     if mood_filtered_data.shape[0] <= 1:
         return mood_filtered_data[['track_name', 'mood']], None
 
@@ -94,12 +119,13 @@ def recommend_songs_by_input(song_name, data, num_recommendations=5):
     # Reset index and drop unnecessary columns
     recommended_songs = recommended_songs.reset_index(drop=True)
 
-    return recommended_songs[['track_name', 'mood', 'similarity']], song_mood
+    return recommended_songs[['track_name', 'mood', 'similarity']], predicted_mood
 
 def recommend_songs_by_mood(user_mood, data, num_recommendations=5):
     mood_filtered_data = data[data['mood'] == user_mood]
     if mood_filtered_data.empty:
         return None
+
     mood_filtered_data = mood_filtered_data.sample(n=min(num_recommendations, len(mood_filtered_data)))
 
     # Reset index and drop unnecessary columns
@@ -169,7 +195,8 @@ with tab1:
 
     if st.button("Recommend by Song"):
         if song_name:
-            recommendations, mood = recommend_songs_by_input(song_name, data, num_recommendations)
+            # Pass rf_model explicitly in the function call
+            recommendations, mood = recommend_songs_by_input(song_name, data, rf_model, num_recommendations)
             if recommendations is not None:
                 st.success(f"🎧 Songs based on '{song_name}' (Mood: {mood}):")
                 st.session_state["history"].append({"Type": "Song Search", "Input": song_name, "Mood": mood})
@@ -177,7 +204,7 @@ with tab1:
                 # Display input song
                 input_song_info = search_song_on_spotify(song_name)
                 if input_song_info:
-                    st.markdown("### **Your Input Song:**")
+                    st.markdown("### Your Input Song:")
                     st.markdown(
                         f"""
                         <div style="text-align: center; background-color: #f9ca24; padding: 18px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
@@ -193,7 +220,7 @@ with tab1:
                     )
 
                 # Display recommended songs
-                st.markdown("### **Recommended Songs:**")
+                st.markdown("### Recommended Songs:")
                 cols = st.columns(2)  # Create 2 equal-width columns
 
                 for idx, (_, row) in enumerate(recommendations.iterrows()):
@@ -218,7 +245,7 @@ with tab1:
                             )
 
                 # Display recommended songs in table format
-                st.markdown("### **Recommended Songs Table:**")
+                st.markdown("### Recommended Songs Table:")
                 st.dataframe(
                     recommendations[['track_name', 'mood', 'similarity']].rename(
                         columns={"track_name": "Song Name", "mood": "Mood", "similarity": "Similarity"}
@@ -361,4 +388,4 @@ with tab3:
         st.markdown(f"### Total searches: {len(st.session_state['history'])}")
 
     else:
-        st.warning("No search history found yet.")
+        st.warning("No search history found yet.")
